@@ -25,7 +25,7 @@ module Mastodon
     end
 
     def build_metadata
-      ENV.fetch('MASTODON_VERSION_METADATA', nil)
+      'yufushiro'
     end
 
     def to_a
@@ -50,7 +50,7 @@ module Mastodon
     end
 
     def repository
-      ENV.fetch('GITHUB_REPOSITORY', 'mastodon/mastodon')
+      ENV.fetch('GITHUB_REPOSITORY', 'yufushiro/mastodon')
     end
 
     def source_base_url
@@ -63,11 +63,8 @@ module Mastodon
     end
 
     def source_url
-      if source_tag
-        "#{source_base_url}/tree/#{source_tag}"
-      else
-        source_base_url
-      end
+      # Pull Request #1 の URL を返す
+      "#{source_base_url}/pull/1"
     end
 
     def user_agent
