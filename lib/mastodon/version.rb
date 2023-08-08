@@ -63,11 +63,8 @@ module Mastodon
     end
 
     def source_url
-      if source_tag
-        "#{source_base_url}/tree/#{source_tag}"
-      else
-        source_base_url
-      end
+      # Pull Request #1 の URL を返す
+      "#{source_base_url}/pull/1"
     end
 
     def source_commit
