@@ -17,19 +17,6 @@ on:
       - '**/*.tsx'
       - '.github/workflows/lint-js.yml'
 
-  pull_request:
-    paths:
-      - 'package.json'
-      - 'yarn.lock'
-      - 'tsconfig.json'
-      - '.nvmrc'
-      - 'eslint.config.mjs'
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '.github/workflows/lint-js.yml'
-
 jobs:
   lint:
     runs-on: ubuntu-latest
