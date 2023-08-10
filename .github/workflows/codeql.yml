@@ -3,15 +3,7 @@ name: 'CodeQL'
 on:
   merge_group:
   push:
-    branches:
-      - 'main'
-      - 'stable-*'
-  pull_request:
-    branches:
-      - 'main'
-      - 'stable-*'
-  schedule:
-    - cron: '22 6 * * 1'
+    branches: ['yufushiro']
 
 jobs:
   analyze:

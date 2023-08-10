@@ -18,20 +18,6 @@ on:
       - '**/*.tsx'
       - '.github/workflows/lint-js.yml'
 
-  pull_request:
-    paths:
-      - 'package.json'
-      - 'yarn.lock'
-      - 'tsconfig.json'
-      - '.nvmrc'
-      - '.prettier*'
-      - '.eslint*'
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '.github/workflows/lint-js.yml'
-
 jobs:
   lint:
     runs-on: ubuntu-latest
