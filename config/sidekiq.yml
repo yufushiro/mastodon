@@ -12,19 +12,19 @@
   :listened_queues_only: true
   :schedule:
     scheduled_statuses_scheduler:
-      every: '5m'
+      interval: '12h'
       class: Scheduler::ScheduledStatusesScheduler
       queue: scheduler
     trends_refresh_scheduler:
-      every: '5m'
+      interval: '12h'
       class: Scheduler::Trends::RefreshScheduler
       queue: scheduler
     trends_review_notifications_scheduler:
-      every: '6h'
+      interval: '12h'
       class: Scheduler::Trends::ReviewNotificationsScheduler
       queue: scheduler
     indexing_scheduler:
-      interval: 1 minute
+      interval: '12h'
       class: Scheduler::IndexingScheduler
       queue: scheduler
     vacuum_scheduler:
@@ -48,19 +48,19 @@
       class: Scheduler::PgheroScheduler
       queue: scheduler
     instance_refresh_scheduler:
-      cron: '0 * * * *'
+      interval: '12h'
       class: Scheduler::InstanceRefreshScheduler
       queue: scheduler
     accounts_statuses_cleanup_scheduler:
-      interval: 1 minute
+      interval: '12h'
       class: Scheduler::AccountsStatusesCleanupScheduler
       queue: scheduler
     suspended_user_cleanup_scheduler:
-      interval: 1 minute
+      interval: '12h'
       class: Scheduler::SuspendedUserCleanupScheduler
       queue: scheduler
     software_update_check_scheduler:
-      interval: 30 minutes
+      interval: '12h'
       class: Scheduler::SoftwareUpdateCheckScheduler
       queue: scheduler
     auto_close_registrations_scheduler:
