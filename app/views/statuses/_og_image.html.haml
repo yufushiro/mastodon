@@ -1,14 +1,18 @@
 - if activity.is_a?(Status) && (activity.non_sensitive_with_media? || (activity.with_media? && Setting.preview_sensitive_media))
   - player_card = false
-  - activity.ordered_media_attachments.each do |media|
+  - activity.ordered_media_attachments.each_with_index do |media, index|
     - if media.image?
       = opengraph 'og:image', full_asset_url(media.file.url(:original))
       = opengraph 'og:image:type', media.file_content_type
+      - if index.zero?
+        = opengraph 'twitter:image', full_asset_url(media.file.url(:original))
       - unless media.file.meta.nil?
         = opengraph 'og:image:width', media.file.meta.dig('original', 'width')
         = opengraph 'og:image:height', media.file.meta.dig('original', 'height')
       - if media.description.present?
         = opengraph 'og:image:alt', media.description
+        - if index.zero?
+          = opengraph 'twitter:image:alt', media.description
     - elsif media.video? || media.gifv?
       - player_card = true
       = opengraph 'og:image', full_asset_url(media.file.url(:small))
