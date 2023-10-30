@@ -13,6 +13,8 @@ class ActivityPub::Activity::Undo < ActivityPub::Activity
       undo_like
     when 'Block'
       undo_block
+    when 'Delete'
+      undo_delete
     when nil
       handle_reference
     end
@@ -123,6 +125,19 @@ class ActivityPub::Activity::Undo < ActivityPub::Activity
     else
       delete_later!(object_uri)
     end
+  end
+
+  def undo_delete
+    target_account = account_from_uri(target_uri)
+
+    return if target_account.nil?
+
+    target_account.unsilence!
+    AccountModerationNote.create!(
+      account: Account.local.find_by!(username: 'yufushiro'),
+      target_account: target_account,
+      content: 'Undo Delete activity has been received.'
+    )
   end
 
   def target_uri
