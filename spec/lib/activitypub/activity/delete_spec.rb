@@ -76,11 +76,8 @@ RSpec.describe ActivityPub::Activity::Delete do
         allow(DeleteAccountService).to receive(:new).and_return(service)
       end
 
-      it 'calls the account deletion service' do
-        subject.perform
-
-        expect(service)
-          .to have_received(:call).with(sender, { reserve_username: false, skip_activitypub: true })
+      it 'updates account to silenced' do
+        expect { subject.perform }.to change { sender.reload.silenced_at }.from(nil).to(be)
       end
     end
 
