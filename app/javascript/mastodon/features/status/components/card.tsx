@@ -132,7 +132,7 @@ const Card: React.FC<CardProps> = ({ card: rawCard, sensitive }) => {
   const interactive = card.type === 'video';
   const language = card.language ?? '';
   const hasImage = (card.image?.length ?? 0) > 0;
-  const largeImage = (hasImage && card.width > card.height) || interactive;
+  const largeImage = false;
   const author = card.authors.at(0)?.accountId;
 
   const description = (
