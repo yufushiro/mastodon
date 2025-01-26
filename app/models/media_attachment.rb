@@ -113,7 +113,7 @@ class MediaAttachment < ApplicationRecord
   }.freeze
 
   VIDEO_PASSTHROUGH_OPTIONS = {
-    video_codecs: ['h264'].freeze,
+    video_codecs: ['h264', 'vp9', 'av1'].freeze,
     audio_codecs: ['aac', nil].freeze,
     colorspaces: ['yuv420p'].freeze,
     options: {
