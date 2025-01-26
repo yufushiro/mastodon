@@ -51,7 +51,7 @@ const mapStateToProps = (state, { params: { acct, id, tagged }, withReplies = fa
     remoteUrl: state.getIn(['accounts', accountId, 'url']),
     isAccount: !!state.getIn(['accounts', accountId]),
     statusIds: state.getIn(['timelines', `account:${path}`, 'items'], emptyList),
-    featuredStatusIds: withReplies ? ImmutableList() : state.getIn(['timelines', `account:${accountId}:pinned${tagged ? `:${tagged}` : ''}`, 'items'], emptyList),
+    featuredStatusIds: withReplies ? ImmutableList() : state.getIn(['timelines', `account:${accountId}:pinned${tagged ? `:${tagged}` : ''}`, 'items'], emptyList).take(3),
     isLoading: state.getIn(['timelines', `account:${path}`, 'isLoading']),
     hasMore: state.getIn(['timelines', `account:${path}`, 'hasMore']),
     suspended: state.getIn(['accounts', accountId, 'suspended'], false),

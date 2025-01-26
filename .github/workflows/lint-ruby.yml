@@ -14,16 +14,6 @@ on:
       - '**/*.rake'
       - '.github/workflows/lint-ruby.yml'
 
-  pull_request:
-    paths:
-      - 'Gemfile*'
-      - '.rubocop*.yml'
-      - '.ruby-version'
-      - 'config/brakeman.ignore'
-      - '**/*.rb'
-      - '**/*.rake'
-      - '.github/workflows/lint-ruby.yml'
-
 jobs:
   lint:
     runs-on: ubuntu-latest

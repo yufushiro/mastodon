@@ -137,7 +137,7 @@ export default class Card extends PureComponent {
     const provider    = card.get('provider_name').length === 0 ? decodeIDNA(getHostname(card.get('url'))) : card.get('provider_name');
     const interactive = card.get('type') === 'video';
     const language    = card.get('language') || '';
-    const largeImage  = (card.get('image')?.length > 0 && card.get('width') > card.get('height')) || interactive;
+    const largeImage  = false;
     const showAuthor  = !!card.getIn(['authors', 0, 'accountId']);
 
     const description = (

@@ -24,23 +24,32 @@
 class CustomEmoji < ApplicationRecord
   include Attachmentable
 
-  LIMIT = 256.kilobytes
+  LIMIT = 1.megabyte
   MINIMUM_SHORTCODE_SIZE = 2
 
   SHORTCODE_RE_FRAGMENT = '[a-zA-Z0-9_]{2,}'
 
-  SCAN_RE = /(?<=[^[:alnum:]:]|\n|^)
+  SCAN_RE = /(?<=[^a-zA-Z0-9]|\n|^)
     :(#{SHORTCODE_RE_FRAGMENT}):
-    (?=[^[:alnum:]:]|$)/x
+    (?=[^a-zA-Z0-9]|$)/x
   SHORTCODE_ONLY_RE = /\A#{SHORTCODE_RE_FRAGMENT}\z/
 
-  IMAGE_MIME_TYPES = %w(image/png image/gif image/webp).freeze
+  IMAGE_MIME_TYPES = %w(image/jpeg image/png image/gif image/webp).freeze
 
   belongs_to :category, class_name: 'CustomEmojiCategory', optional: true
 
   has_one :local_counterpart, -> { where(domain: nil) }, class_name: 'CustomEmoji', primary_key: :shortcode, foreign_key: :shortcode, inverse_of: false, dependent: nil
 
-  has_attached_file :image, styles: { static: { format: 'png', convert_options: '-coalesce +profile "!icc,*" +set date:modify +set date:create +set date:timestamp', file_geometry_parser: FastGeometryParser } }, validate_media_type: false, processors: [:lazy_thumbnail]
+  has_attached_file :image,
+                    styles: {
+                      static: {
+                        format: 'png',
+                        convert_options: '-coalesce +profile "!icc,*" +set date:modify +set date:create +set date:timestamp',
+                        file_geometry_parser: FastGeometryParser,
+                      },
+                    },
+                    validate_media_type: false,
+                    processors: [:lazy_thumbnail]
 
   normalizes :domain, with: ->(domain) { domain.downcase }
 
