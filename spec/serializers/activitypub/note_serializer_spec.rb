@@ -126,4 +126,93 @@ RSpec.describe ActivityPub::NoteSerializer do
       })
     end
   end
+
+  # m.yufushiro.dev 用の拡張 (Misskey 互換の引用機能)
+  describe '[yufushiro]' do
+    context 'with legacy quote' do
+      subject { serialized_record_json(quote_status, described_class, adapter: ActivityPub::Adapter) }
+
+      let!(:quote_status) do
+        Fabricate(
+          :status,
+          text: <<~TEXT
+            hogehoge
+
+            RE: https://example.com/statuses/1234
+          TEXT
+        )
+      end
+
+      it 'has the expected shape for legacy quote status' do
+        expect(subject).to include({
+          '@context' => [
+            'https://www.w3.org/ns/activitystreams',
+            include(
+              '_misskey_quote' => 'https://misskey-hub.net/ns#_misskey_quote'
+            ),
+          ],
+          'type' => 'Note',
+          'content' =>
+            '<p>hogehoge</p>' \
+            '<p class="quote-inline">RE: ' \
+            '<a href="https://example.com/statuses/1234" target="_blank" rel="nofollow noopener" translate="no">' \
+            '<span class="invisible">https://</span>' \
+            '<span class="">example.com/statuses/1234</span>' \
+            '<span class="invisible"></span>' \
+            '</a>' \
+            '</p>',
+          'source' => {
+            'mediaType' => 'text/x.misskeymarkdown',
+            'content' => 'hogehoge',
+          },
+          '_misskey_quote' => 'https://example.com/statuses/1234',
+        })
+        expect(subject).not_to include('quote')
+      end
+    end
+
+    # v4.5.x の引用機能 + Misskey 向け出力
+    context 'with quote' do
+      subject { serialized_record_json(quote_status, described_class, adapter: ActivityPub::Adapter) }
+
+      let(:remote_account) { Fabricate(:account, domain: 'example.com') }
+      let(:quoted_status) { Fabricate(:status, account: remote_account, uri: 'https://example.com/statuses/1234') }
+      let(:quote_status) { Fabricate(:status, text: 'hogehoge') }
+      let!(:quote) do
+        Fabricate(
+          :quote,
+          status: quote_status,
+          quoted_status: quoted_status,
+          state: :accepted
+        )
+      end
+
+      it 'has the expected shape for quote status' do
+        expect(subject).to include({
+          '@context' => [
+            'https://www.w3.org/ns/activitystreams',
+            include(
+              '_misskey_quote' => 'https://misskey-hub.net/ns#_misskey_quote'
+            ),
+          ],
+          'type' => 'Note',
+          'content' =>
+            '<p class="quote-inline">RE: ' \
+            '<a href="https://example.com/statuses/1234" target="_blank" rel="nofollow noopener" translate="no">' \
+            '<span class="invisible">https://</span>' \
+            '<span class="">example.com/statuses/1234</span>' \
+            '<span class="invisible"></span>' \
+            '</a>' \
+            '</p>' \
+            '<p>hogehoge</p>',
+          'source' => {
+            'mediaType' => 'text/x.misskeymarkdown',
+            'content' => 'hogehoge',
+          },
+          'quote' => 'https://example.com/statuses/1234',
+          '_misskey_quote' => 'https://example.com/statuses/1234',
+        })
+      end
+    end
+  end
 end
