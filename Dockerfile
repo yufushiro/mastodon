@@ -122,7 +122,6 @@ RUN \
   # libvips components
   libcgif0 \
   libexif12 \
-  libheif1 \
   libhwy1t64 \
   libimagequant0 \
   libjpeg62-turbo \
@@ -145,7 +144,6 @@ RUN \
   libvorbisfile3 \
   libvpx9 \
   libx264-164 \
-  libx265-215 \
   ; \
   # Patch Ruby to use jemalloc
   patchelf --add-needed libjemalloc.so.2 /usr/local/bin/ruby; \
@@ -185,7 +183,6 @@ RUN \
   libexpat1-dev \
   libgirepository1.0-dev \
   libglib2.0-dev \
-  libheif-dev \
   libhwy-dev \
   libimagequant-dev \
   libjpeg62-turbo-dev \
@@ -202,7 +199,6 @@ RUN \
   libvorbis-dev \
   libvpx-dev \
   libx264-dev \
-  libx265-dev \
   ;
 
 # Create temporary libvips specific build layer
@@ -267,7 +263,8 @@ RUN \
   --enable-libvpx \
   --enable-libwebp \
   --enable-libx264 \
-  --enable-libx265 \
+  --disable-decoder=hevc* \
+  --disable-encoder=hevc* \
   --enable-shared \
   --enable-version3 \
   ; \
