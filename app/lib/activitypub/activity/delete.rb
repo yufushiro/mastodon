@@ -55,6 +55,12 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
 
     return if @status.nil?
 
+    if @status.has_favourite_or_bookmarked?
+      @status.update! visibility: :private
+      @status.reblogs.update_all visibility: :private
+      return
+    end
+
     forwarder.forward! if forwarder.forwardable?
     RemoveStatusService.new.call(@status, redraft: false)
 
