@@ -36,7 +36,7 @@ class Scheduler::VacuumScheduler
   end
 
   def preview_cards_vacuum
-    Vacuum::PreviewCardsVacuum.new(content_retention_policy.media_cache_retention_period)
+    Vacuum::PreviewCardsVacuum.new(7.days.in_days)
   end
 
   def backups_vacuum
