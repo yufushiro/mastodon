@@ -60,7 +60,7 @@ class FanOutOnWriteService < BaseService
   end
 
   def notify_quoted_account!
-    return unless @status.quote&.quoted_account&.local? && @status.quote&.accepted?
+    return unless @status.quote&.quoted_account&.local?
 
     LocalNotificationWorker.perform_async(@status.quote.quoted_account_id, @status.quote.id, 'Quote', 'quote')
   end
