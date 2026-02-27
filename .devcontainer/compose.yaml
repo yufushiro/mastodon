@@ -67,10 +67,6 @@ services:
       - es-data:/usr/share/elasticsearch/data
     networks:
       - internal_network
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
 
   libretranslate:
     image: libretranslate/libretranslate:v1.7.3
