@@ -20,7 +20,7 @@ class Api::V1::Statuses::ReblogsController < Api::V1::Statuses::BaseController
   end
 
   def destroy
-    @status = current_account.statuses.find_by(reblog_of_id: params[:status_id])
+    @status = current_account.statuses.where(reblog_of_id: params[:status_id]).order(id: :desc).first
 
     if @status
       authorize @status, :unreblog?
