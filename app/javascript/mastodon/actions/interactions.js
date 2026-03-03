@@ -453,6 +453,12 @@ function toggleReblogWithoutConfirmation(status, visibility) {
   };
 }
 
+function reblogWithoutConfirmation(status, visibility) {
+  return (dispatch) => {
+    dispatch(reblog({ statusId: status.get('id'), visibility }));
+  };
+}
+
 export function toggleReblog(statusId, skipModal = false) {
   return (dispatch, getState) => {
     const state = getState();
@@ -470,6 +476,22 @@ export function toggleReblog(statusId, skipModal = false) {
     } else {
       dispatch(toggleReblogWithoutConfirmation(status));
     }
+  };
+}
+
+export function forceReblog(statusId) {
+  return (dispatch, getState) => {
+    const state = getState();
+    let status = state.statuses.get(statusId);
+
+    if (!status)
+      return;
+
+    // The reblog modal expects a pre-filled account in status
+    // TODO: fix this by having the reblog modal get a statusId and do the work itself
+    status = status.set('account', state.accounts.get(status.get('account')));
+
+    dispatch(reblogWithoutConfirmation(status, 'public'));
   };
 }
 

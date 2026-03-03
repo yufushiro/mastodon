@@ -16,10 +16,6 @@ class ReblogService < BaseService
 
     authorize_with account, reblogged_status, :reblog?
 
-    reblog = account.statuses.find_by(reblog: reblogged_status)
-
-    return reblog unless reblog.nil?
-
     visibility = if reblogged_status.hidden?
                    reblogged_status.visibility
                  else
