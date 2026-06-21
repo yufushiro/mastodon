@@ -23,6 +23,7 @@ class Webhook < ApplicationRecord
     report.updated
     status.created
     status.updated
+    status.misskey_reaction
   ).freeze
 
   SECRET_LENGTH_MIN = 12
@@ -60,6 +61,8 @@ class Webhook < ApplicationRecord
   end
 
   def self.permission_for_event(event)
+    return :view_devops if event == 'status.misskey_reaction'
+
     case event
     when 'account.approved', 'account.created', 'account.updated'
       :manage_users
