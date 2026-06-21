@@ -2,6 +2,8 @@
 
 class REST::Admin::WebhookEventSerializer < ActiveModel::Serializer
   def self.serializer_for(model, options)
+    return REST::Admin::WebhookMisskeyReactionSerializer if model.is_a?(Webhooks::MisskeyReactionEvent)
+
     case model.class.name
     when 'Account'
       REST::Admin::AccountSerializer
