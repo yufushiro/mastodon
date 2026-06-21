@@ -29,5 +29,18 @@ RSpec.describe REST::Admin::WebhookEventSerializer do
 
       it { is_expected.to eq(ActiveModel::Serializer::CollectionSerializer) }
     end
+
+    context '[yufushiro] with a Misskey reaction event model' do
+      let(:model) do
+        Webhooks::MisskeyReactionEvent.new(
+          uri: 'https://example.com/@alice/1',
+          acct: 'hoge@example.com',
+          emoji: '👀',
+          created_at: Time.zone.now,
+        )
+      end
+
+      it { is_expected.to eq(REST::Admin::WebhookMisskeyReactionSerializer) }
+    end
   end
 end
