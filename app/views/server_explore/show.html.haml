@@ -1,0 +1,27 @@
+- content_for :page_title, 'Fediverseサーバーを探す'
+
+- content_for :content do
+  %main.container.server-explore
+    %h1 Fediverseサーバーを探す
+    %p.lead このサーバーとの関わりがある外部のFediverseサーバーのリストです（上位20件）
+
+    - if @servers.empty?
+      %p リモートサーバーが見つかりませんでした
+    - else
+      .applications-list
+        - @servers.each do |domain, follows_count|
+          = link_to "https://#{domain}/", target: '_blank', rel: 'noopener' do
+            .applications-list__item
+              %strong.announcements-list__item__title
+                = domain
+              .announcements-list__item__action-bar
+                .announcements-list__item__meta
+                  .desc-item
+                    %span m.yufushiro.dev
+                    からフォロー中のユーザー数:
+                    = follows_count
+                  - if @server_descriptions.key? domain
+                    .desc-item
+                      = @server_descriptions[domain]
+
+= render template: 'layouts/application'
