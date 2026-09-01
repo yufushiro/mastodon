@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import type { SetRequired } from 'type-fest';
 
 import { quoteComposeById } from '@/mastodon/actions/compose_typed';
-import { toggleReblog } from '@/mastodon/actions/interactions';
+import { forceReblog, toggleReblog } from '@/mastodon/actions/interactions';
 import { openModal } from '@/mastodon/actions/modal';
 import { fetchStatus } from '@/mastodon/actions/statuses';
 import { useStatus } from '@/mastodon/hooks/useStatus';
@@ -16,6 +16,7 @@ import { quickBoosting } from '@/mastodon/initial_state';
 import type { ActionMenuItem } from '@/mastodon/models/dropdown_menu';
 import { selectStatusConditions } from '@/mastodon/selectors/statuses';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
 
 import type { RenderItemFn } from '../dropdown_menu';
 import { Dropdown, DropdownMenuItemContent } from '../dropdown_menu';
@@ -146,6 +147,16 @@ const BoostOrQuoteMenu: FC<ReblogButtonProps> = ({ statusId, counters }) => {
         },
       },
       {
+        text: '強制的にブースト',
+        description: undefined,
+        icon: RepeatIcon,
+        highlighted: false,
+        disabled: !statusState.isReblogged,
+        action: () => {
+          dispatch(forceReblog(statusId));
+        },
+      },
+      {
         text: intl.formatMessage(quoteItem.title),
         description: quoteItem.meta
           ? intl.formatMessage(quoteItem.meta)
@@ -156,7 +167,11 @@ const BoostOrQuoteMenu: FC<ReblogButtonProps> = ({ statusId, counters }) => {
           dispatch(quoteComposeById(statusId));
         },
       },
-    ] satisfies [ActionMenuItemWithIcon, ActionMenuItemWithIcon];
+    ] satisfies [
+      ActionMenuItemWithIcon,
+      ActionMenuItemWithIcon,
+      ActionMenuItemWithIcon,
+    ];
   }, [dispatch, intl, statusId, statusState, wasBoosted]);
 
   const boostIcon = items[0].icon;

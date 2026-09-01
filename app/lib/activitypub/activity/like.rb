@@ -10,5 +10,17 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
 
     LocalNotificationWorker.perform_async(original_status.account_id, favourite.id, 'Favourite', 'favourite')
     Trends.statuses.register(original_status)
+
+    if @json['_misskey_reaction'].present?
+      WebhookService.new.call(
+        'status.misskey_reaction',
+        Webhooks::MisskeyReactionEvent.new(
+          uri: original_status.uri,
+          acct: @account.acct,
+          emoji: @json['_misskey_reaction'],
+          created_at: Time.zone.now,
+        )
+      )
+    end
   end
 end
