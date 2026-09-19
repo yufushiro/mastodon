@@ -121,7 +121,6 @@ class Status < ApplicationRecord
   validates :text, presence: true, unless: -> { with_media? || reblog? || with_quote? }
   validates_with StatusLengthValidator
   validates_with DisallowedHashtagsValidator
-  validates :reblog, uniqueness: { scope: :account }, if: :reblog?
 
   accepts_nested_attributes_for :poll
 
@@ -213,6 +212,10 @@ class Status < ApplicationRecord
 
   def reblog?
     !reblog_of_id.nil?
+  end
+
+  def has_favourite_or_bookmarked?
+    favourites.joins(:account).merge(Account.local).exists? || bookmarks.joins(:account).merge(Account.local).exists?
   end
 
   def within_realtime_window?

@@ -46,7 +46,7 @@ class ClosedRegistrationsModal extends ImmutablePureComponent {
           <NavigationFocusTarget as='h1'>
             <FormattedMessage id='closed_registrations_modal.title' defaultMessage='Signing up on Mastodon' />
           </NavigationFocusTarget>
-          <p>
+          <p style={{ display: 'none' }}>
             <FormattedMessage
               id='closed_registrations_modal.preamble'
               defaultMessage='Mastodon is decentralized, so no matter where you create your account, you will be able to follow and interact with anyone on this server. You can even self-host it!'
@@ -68,7 +68,7 @@ class ClosedRegistrationsModal extends ImmutablePureComponent {
                 defaultMessage='Since Mastodon is decentralized, you can create an account on another server and still interact with this one.'
               />
             </p>
-            <a href='https://joinmastodon.org/servers' className='button button--block'><FormattedMessage id='closed_registrations_modal.find_another_server' defaultMessage='Find another server' /></a>
+            <a href='/server_explore' target='_blank' rel='noopener' className='button button--block'><FormattedMessage id='closed_registrations_modal.find_another_server' defaultMessage='Find another server' /></a>
           </div>
         </div>
       </div>

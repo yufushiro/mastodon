@@ -67,8 +67,10 @@ export const StatusHeader: FC<StatusHeaderProps> = ({
 
       {contentBeforeDate}
 
-      <Link
-        to={`/@${statusAccount.acct}/${status.id}`}
+      <a
+        href={status.url}
+        target='_blank'
+        rel='noopener noreferrer'
         className='status__relative-time'
       >
         <span className='status__visibility-icon'>
@@ -76,7 +78,7 @@ export const StatusHeader: FC<StatusHeaderProps> = ({
         </span>
         <RelativeTimestamp timestamp={status.created_at} />
         {editedAt && <StatusEditedAt editedAt={editedAt} />}
-      </Link>
+      </a>
 
       {contentAfterDate}
     </div>

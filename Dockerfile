@@ -102,6 +102,7 @@ RUN \
   apt-get dist-upgrade -yq; \
   # Install jemalloc and other necessary components
   apt-get install -y --no-install-recommends \
+  bzip2 \
   curl \
   file \
   libjemalloc2 \
@@ -122,7 +123,6 @@ RUN \
   # libvips components
   libcgif0 \
   libexif12 \
-  libheif1 \
   libhwy1t64 \
   libimagequant0 \
   libjpeg62-turbo \
@@ -144,8 +144,23 @@ RUN \
   libvorbisenc2 \
   libvorbisfile3 \
   libvpx9 \
-  libx264-164 \
-  libx265-215 \
+  ; \
+  # Install OpenH264 binary
+  case "$(dpkg --print-architecture)" in \
+    "amd64") \
+      curl 'http://ciscobinary.openh264.org/libopenh264-2.6.0-linux64.8.so.bz2' | bunzip2 > libopenh264.so.8 \
+        && echo 'MD5 (libopenh264.so.8) = 1859c0aaf825429cbf36f1f496c5e08c' | md5sum -c \
+        && mv ./libopenh264.so.8 /usr/local/lib/; \
+      ;; \
+    "arm64") \
+      curl 'http://ciscobinary.openh264.org/libopenh264-2.6.0-linux-arm64.8.so.bz2' | bunzip2 > libopenh264.so.8 \
+        && echo 'MD5 (libopenh264.so.8) = 9394e36085a540e34fc6e5d16929f151' | md5sum -c \
+        && mv ./libopenh264.so.8 /usr/local/lib/; \
+      ;; \
+    *) \
+      echo "Unsupported architecture"; exit 1; \
+      ;; \
+  esac \
   ; \
   # Patch Ruby to use jemalloc
   patchelf --add-needed libjemalloc.so.2 /usr/local/bin/ruby; \
@@ -185,7 +200,6 @@ RUN \
   libexpat1-dev \
   libgirepository1.0-dev \
   libglib2.0-dev \
-  libheif-dev \
   libhwy-dev \
   libimagequant-dev \
   libjpeg62-turbo-dev \
@@ -201,8 +215,7 @@ RUN \
   libsnappy-dev \
   libvorbis-dev \
   libvpx-dev \
-  libx264-dev \
-  libx265-dev \
+  libopenh264-dev \
   ;
 
 # Create temporary libvips specific build layer
@@ -266,8 +279,11 @@ RUN \
   --enable-libvorbis \
   --enable-libvpx \
   --enable-libwebp \
-  --enable-libx264 \
-  --enable-libx265 \
+  --disable-decoder=h264* \
+  --disable-encoder=h264* \
+  --enable-libopenh264 \
+  --disable-decoder=hevc* \
+  --disable-encoder=hevc* \
   --enable-shared \
   --enable-version3 \
   ; \
