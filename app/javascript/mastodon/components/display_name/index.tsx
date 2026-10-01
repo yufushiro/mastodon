@@ -3,6 +3,7 @@ import type { ComponentPropsWithoutRef, FC } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
+import { useIdentity } from '@/mastodon/identity_context';
 import type { Account, AccountShapeFull } from '@/mastodon/models/account';
 
 import { DisplayNameDefault } from './default';
@@ -34,6 +35,27 @@ export const LinkedDisplayName: FC<
   const { account } = displayProps;
   if (!account) {
     return <DisplayName {...displayProps} />;
+  }
+
+  const isRemote = account.acct.includes('@');
+  if (isRemote) {
+    const { signedIn } = useIdentity();
+    if (!signedIn) {
+      return (
+        <a
+          href={account.url}
+          target='_blank'
+          rel='noopener'
+          title={`@${account.acct}`}
+          data-id={account.id}
+          data-hover-card-account={account.id}
+          {...linkProps}
+        >
+          {children}
+          <DisplayName {...displayProps} />
+        </a>
+      );
+    }
   }
 
   return (
