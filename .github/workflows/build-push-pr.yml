@@ -30,6 +30,7 @@ jobs:
     needs: compute-suffix
     uses: ./.github/workflows/build-container-image.yml
     with:
+      cache: false
       file_to_build: Dockerfile
       push_to_images: |
         ghcr.io/yufushiro/mastodon
@@ -45,6 +46,7 @@ jobs:
     needs: compute-suffix
     uses: ./.github/workflows/build-container-image.yml
     with:
+      cache: false
       file_to_build: streaming/Dockerfile
       push_to_images: |
         ghcr.io/yufushiro/mastodon-streaming
