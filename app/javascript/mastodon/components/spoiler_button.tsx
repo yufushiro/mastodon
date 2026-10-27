@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+
 import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
@@ -8,6 +10,9 @@ interface Props {
   uncached?: boolean;
   matchedFilters?: string[];
   onClick: React.MouseEventHandler<HTMLButtonElement>;
+  // Called when the button is long-pressed / released afterwards.
+  onPeekStart?: () => void;
+  onPeekEnd?: () => void;
 }
 
 export const SpoilerButton: React.FC<Props> = ({
@@ -16,7 +21,12 @@ export const SpoilerButton: React.FC<Props> = ({
   uncached = false,
   matchedFilters,
   onClick,
+  onPeekStart,
+  onPeekEnd,
 }) => {
+  const { handleClick, handlePointerDown, handleContextMenu } =
+    useLongPressPeek({ onClick, onPeekStart, onPeekEnd });
+
   let warning;
   let action;
 
@@ -76,7 +86,9 @@ export const SpoilerButton: React.FC<Props> = ({
       <button
         type='button'
         className='spoiler-button__overlay'
-        onClick={onClick}
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onContextMenu={handleContextMenu}
         disabled={uncached}
       >
         <span className='spoiler-button__overlay__label'>
@@ -87,3 +99,104 @@ export const SpoilerButton: React.FC<Props> = ({
     </div>
   );
 };
+
+const LONG_PRESS_DELAY_MS = 500;
+
+// setTimeout that is cancelled when the signal is aborted.
+const abortableTimeout = (
+  callback: () => void,
+  delay: number,
+  signal: AbortSignal,
+) => {
+  if (signal.aborted) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    signal.removeEventListener('abort', onAbort);
+    callback();
+  }, delay);
+
+  const onAbort = () => {
+    clearTimeout(timer);
+  };
+  signal.addEventListener('abort', onAbort, { once: true });
+};
+
+// Detects a long press and reports it via onPeekStart / onPeekEnd (on release).
+// The click that follows a long press is swallowed.
+function useLongPressPeek({
+  onClick,
+  onPeekStart,
+  onPeekEnd,
+}: Pick<Props, 'onClick' | 'onPeekStart' | 'onPeekEnd'>) {
+  const pressAbort = useRef<AbortController | null>(null);
+  const peeked = useRef(false);
+  const suppressClick = useRef(false);
+  const onPeekEndRef = useRef(onPeekEnd);
+  useLayoutEffect(() => {
+    onPeekEndRef.current = onPeekEnd;
+  }, [onPeekEnd]);
+
+  const endPress = useCallback(() => {
+    pressAbort.current?.abort();
+    pressAbort.current = null;
+
+    if (peeked.current) {
+      peeked.current = false;
+      suppressClick.current = true;
+      onPeekEndRef.current?.();
+      // Clear the flag in case no click event follows the release.
+      setTimeout(() => {
+        suppressClick.current = false;
+      }, 0);
+    }
+  }, []);
+
+  useEffect(() => endPress, [endPress]);
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!onPeekStart || (e.pointerType === 'mouse' && e.button !== 0)) {
+        return;
+      }
+
+      endPress();
+
+      const controller = new AbortController();
+      const { signal } = controller;
+      pressAbort.current = controller;
+      document.addEventListener('pointerup', endPress, { signal });
+      document.addEventListener('pointercancel', endPress, { signal });
+
+      abortableTimeout(
+        () => {
+          peeked.current = true;
+          onPeekStart();
+        },
+        LONG_PRESS_DELAY_MS,
+        signal,
+      );
+    },
+    [endPress, onPeekStart],
+  );
+
+  const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
+    (e) => {
+      if (suppressClick.current) {
+        suppressClick.current = false;
+        return;
+      }
+      onClick(e);
+    },
+    [onClick],
+  );
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    if (peeked.current) {
+      e.preventDefault();
+    }
+  }, []);
+
+  return { handleClick, handlePointerDown, handleContextMenu };
+}
