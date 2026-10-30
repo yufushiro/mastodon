@@ -232,6 +232,7 @@ class MediaGallery extends PureComponent {
   state = {
     visible: this.props.visible !== undefined ? this.props.visible : (displayMedia !== 'hide_all' && !this.props.sensitive || displayMedia === 'show_all'),
     width: this.props.defaultWidth,
+    peeking: false,
   };
 
   componentDidMount () {
@@ -264,6 +265,14 @@ class MediaGallery extends PureComponent {
     } else {
       this.setState({ visible: !this.state.visible });
     }
+  };
+
+  handlePeekStart = () => {
+    this.setState({ peeking: true });
+  };
+
+  handlePeekEnd = () => {
+    this.setState({ peeking: false });
   };
 
   handleClick = (index) => {
@@ -301,6 +310,8 @@ class MediaGallery extends PureComponent {
     const { visible } = this.state;
     const width = this.state.width || defaultWidth;
 
+    const { peeking } = this.state;
+
     let children;
 
     const style = {};
@@ -315,16 +326,26 @@ class MediaGallery extends PureComponent {
     const uncached = media.every(attachment => attachment.get('type') === 'unknown');
 
     if (this.isFullSizeEligible()) {
-      children = <Item standalone autoplay={autoplay} onClick={this.handleClick} attachment={media.get(0)} lang={lang} displayWidth={width} visible={visible} />;
+      children = <Item standalone autoplay={autoplay} onClick={this.handleClick} attachment={media.get(0)} lang={lang} displayWidth={width} visible={visible || peeking} />;
     } else {
-      children = media.map((attachment, i) => <Item key={attachment.get('id')} autoplay={autoplay} onClick={this.handleClick} attachment={attachment} index={i} lang={lang} size={size} displayWidth={width} visible={visible || uncached} />);
+      children = media.map((attachment, i) => <Item key={attachment.get('id')} autoplay={autoplay} onClick={this.handleClick} attachment={attachment} index={i} lang={lang} size={size} displayWidth={width} visible={visible || peeking || uncached} />);
     }
 
     return (
       <div className={`media-gallery media-gallery--layout-${size}`} style={style} ref={this.handleRef}>
         {children}
 
-        {(!visible || uncached) && <SpoilerButton uncached={uncached} sensitive={sensitive} onClick={this.handleOpen} matchedFilters={matchedFilters} />}
+        {(!visible || uncached) && (
+          <SpoilerButton
+            hidden={peeking}
+            uncached={uncached}
+            sensitive={sensitive}
+            onClick={this.handleOpen}
+            onPeekStart={uncached ? undefined : this.handlePeekStart}
+            onPeekEnd={this.handlePeekEnd}
+            matchedFilters={matchedFilters}
+          />
+        )}
 
         {(visible && !uncached) && (
           <div className='media-gallery__actions'>

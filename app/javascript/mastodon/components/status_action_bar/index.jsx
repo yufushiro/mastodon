@@ -250,6 +250,11 @@ class StatusActionBar extends ImmutablePureComponent {
     navigator.clipboard.writeText(url);
   };
 
+  handleCopyUri = () => {
+    const uri = this.props.status.get('uri');
+    navigator.clipboard.writeText(uri);
+  };
+
   render () {
     const { status, relationship, statusQuoteState, quotedAccountId, contextType, intl, withDismiss, withCounters, scrollKey } = this.props;
     const { signedIn, permissions } = this.props.identity;
@@ -271,6 +276,8 @@ class StatusActionBar extends ImmutablePureComponent {
     }
 
     menu.push({ text: intl.formatMessage(messages.copy), action: this.handleCopy });
+
+    menu.push({ text: 'uri をコピー', action: this.handleCopyUri });
 
     if (publicStatus && 'share' in navigator) {
       menu.push({ text: intl.formatMessage(messages.share), action: this.handleShareClick });
