@@ -14,16 +14,6 @@ on:
       - '**/*.scss'
       - '.github/workflows/lint-css.yml'
 
-  pull_request:
-    paths:
-      - 'package.json'
-      - 'yarn.lock'
-      - '.nvmrc'
-      - 'stylelint.config.js'
-      - '**/*.css'
-      - '**/*.scss'
-      - '.github/workflows/lint-css.yml'
-
 jobs:
   lint:
     runs-on: ubuntu-latest

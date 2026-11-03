@@ -41,6 +41,7 @@ class NodeInfo::Serializer < ActiveModel::Serializer
     {
       nodeName: Setting.site_title,
       nodeDescription: Setting.site_short_description,
+      themeColor: '#99ddff',
     }
   end
 

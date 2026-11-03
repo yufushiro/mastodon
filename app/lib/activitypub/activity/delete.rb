@@ -11,8 +11,15 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
   private
 
   def delete_person
-    with_redis_lock("delete_in_progress:#{@account.id}", autorelease: 2.hours, raise_on_failure: false) do
-      DeleteAccountService.new.call(@account, reserve_username: false, skip_activitypub: true)
+    # Workaround for some implementations (such as Misskey) that send Delete activity for non-permanent account suspension.
+    @account.silence!
+    admin_account = Account.local.find_by(username: 'yufushiro')
+    if admin_account.present?
+      AccountModerationNote.create!(
+        account: admin_account,
+        target_account: @account,
+        content: 'Delete activity has been received.'
+      )
     end
   end
 
@@ -47,6 +54,12 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
     @status ||= Status.find_by(uri: @object['atomUri'], account: @account) if @object.is_a?(Hash) && @object['atomUri'].present?
 
     return if @status.nil?
+
+    if @status.has_favourite_or_bookmarked?
+      @status.update! visibility: :private
+      @status.reblogs.update_all visibility: :private
+      return
+    end
 
     forwarder.forward! if forwarder.forwardable?
     RemoveStatusService.new.call(@status, redraft: false)

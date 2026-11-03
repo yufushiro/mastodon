@@ -16,6 +16,8 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   attribute :content_map, if: :language?
   attribute :updated, if: :edited?
 
+  attribute :source_for_misskey_quote, key: :source, if: -> { serializable_quote? || local_legacy_quote? }
+
   has_many :virtual_attachments, key: :attachment
   has_many :virtual_tags, key: :tag
 
@@ -42,6 +44,23 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
     ActivityPub::TagManager.instance.uri_for(object)
   end
 
+  LOCAL_LEGACY_QUOTE_PATTERN = %r{^RE:\s*(https://[^\s]+)\s*\Z}
+
+  def local_legacy_quote?
+    object.local? && !local_legacy_quote_uri.nil?
+  end
+
+  def local_legacy_quote_uri
+    @local_legacy_quote_uri ||= object.text.match(LOCAL_LEGACY_QUOTE_PATTERN).try { self[1] }
+  end
+
+  def source_for_misskey_quote
+    {
+      'mediaType' => 'text/x.misskeymarkdown',
+      'content' => object.text.sub(LOCAL_LEGACY_QUOTE_PATTERN, '').rstrip,
+    }
+  end
+
   def type
     object.preloadable_poll ? 'Question' : 'Note'
   end
@@ -51,7 +70,9 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   def content
-    status_content_format(object)
+    html = status_content_format(object)
+    html = html.sub('<p>RE:', '<p class="quote-inline">RE:') if local_legacy_quote?
+    html
   end
 
   def content_map
@@ -215,7 +236,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   def serializable_quote?
-    object.quote&.quoted_status&.present?
+    object.quote&.quoted_status&.present? || local_legacy_quote?
   end
 
   def quote_authorization?
@@ -223,6 +244,8 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   def quote
+    return local_legacy_quote_uri if local_legacy_quote?
+
     # TODO: handle inlining self-quotes
     object.quote.quoted_status.present? ? ActivityPub::TagManager.instance.uri_for(object.quote.quoted_status) : { type: 'Tombstone' }
   end
