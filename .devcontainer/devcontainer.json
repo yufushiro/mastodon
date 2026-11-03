@@ -4,10 +4,6 @@
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
-  "features": {
-    "ghcr.io/devcontainers/features/sshd:1": {}
-  },
-
   "forwardPorts": [3000, 4000],
 
   "portsAttributes": {
@@ -29,14 +25,10 @@
     "onAutoForward": "silent"
   },
 
-  "onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-  "postCreateCommand": "bin/setup",
-  "waitFor": "postCreateCommand",
-
   "customizations": {
     "vscode": {
       "settings": {},
-      "extensions": ["EditorConfig.EditorConfig", "webben.browserslist"]
+      "extensions": []
     }
   }
 }
