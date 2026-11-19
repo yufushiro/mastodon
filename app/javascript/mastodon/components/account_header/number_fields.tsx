@@ -9,7 +9,6 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import { FormattedDateWrapper } from '../formatted_date';
 import { NumberFields, NumberFieldsItem } from '../number_fields';
-import { ShortNumber } from '../short_number';
 
 import classes from './styles.module.scss';
 
@@ -43,7 +42,7 @@ export const AccountNumberFields: FC<{ accountId: string }> = ({
         hint={intl.formatNumber(account.followers_count)}
         link={`/@${account.acct}/followers`}
       >
-        <ShortNumber value={account.followers_count} />
+        {intl.formatNumber(account.followers_count)}
       </NumberFieldsItem>
 
       <NumberFieldsItem
@@ -53,14 +52,14 @@ export const AccountNumberFields: FC<{ accountId: string }> = ({
         hint={intl.formatNumber(account.following_count)}
         link={`/@${account.acct}/following`}
       >
-        <ShortNumber value={account.following_count} />
+        {intl.formatNumber(account.following_count)}
       </NumberFieldsItem>
 
       <NumberFieldsItem
         label={<FormattedMessage id='account.posts' defaultMessage='Posts' />}
         hint={intl.formatNumber(account.statuses_count)}
       >
-        <ShortNumber value={account.statuses_count} />
+        {intl.formatNumber(account.statuses_count)}
       </NumberFieldsItem>
 
       <NumberFieldsItem
@@ -70,15 +69,12 @@ export const AccountNumberFields: FC<{ accountId: string }> = ({
         hint={intl.formatDate(account.created_at)}
       >
         <button type='button' onClick={showJoinModal}>
-          {createdThisYear ? (
-            <FormattedDateWrapper
-              value={account.created_at}
-              month='short'
-              day='2-digit'
-            />
-          ) : (
-            <FormattedDateWrapper value={account.created_at} year='numeric' />
-          )}
+          <FormattedDateWrapper
+            value={account.created_at}
+            month='short'
+            day='numeric'
+            year='numeric'
+          />
         </button>
       </NumberFieldsItem>
     </NumberFields>

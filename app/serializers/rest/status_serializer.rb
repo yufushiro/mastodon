@@ -38,7 +38,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   has_one :quote_approval
 
   def quote
-    object.quote if object.quote&.acceptable?
+    object.quote
   end
 
   def id
